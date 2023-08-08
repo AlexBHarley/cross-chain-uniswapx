@@ -19,7 +19,7 @@ contract CrossChainExecutor is Ownable, Initializable {
     IMailbox public immutable MAILBOX;
     address public REACTOR;
 
-    constructor(address _mailbox, uint32 _remoteDomain) Ownable() {
+    constructor(address _mailbox) Ownable() {
         MAILBOX = IMailbox(_mailbox);
     }
 

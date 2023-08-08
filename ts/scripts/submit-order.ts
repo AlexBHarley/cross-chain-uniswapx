@@ -1,18 +1,6 @@
-import {
-  DutchOrder,
-  NonceManager,
-  DutchOrderBuilder,
-} from "@uniswap/uniswapx-sdk";
-import { BigNumber, Wallet, constants, ethers, utils } from "ethers";
-import {
-  createPublicClient,
-  http,
-  WalletClient,
-  createWalletClient,
-  Address,
-} from "viem";
-import { goerli, optimismGoerli } from "viem/chains";
-import { privateKeyToAccount } from "viem/accounts";
+import { DutchOrderBuilder } from "@uniswap/uniswapx-sdk";
+import { BigNumber, Wallet, constants, ethers } from "ethers";
+import { optimismGoerli } from "viem/chains";
 
 import dotenv from "dotenv";
 dotenv.config();

@@ -13,16 +13,18 @@ contract CrossChainReactor is ReactorEvents {
 
     IMailbox public immutable MAILBOX;
 
-    constructor(IPermit2 _permit2, address _protocolFeeOwner, address _mailbox) {
+    constructor(address _mailbox) {
         MAILBOX = IMailbox(_mailbox);
     }
 
     function handle(bytes calldata _message, bytes calldata _metadata) external {
         require(msg.sender == address(MAILBOX), "!mailbox");
-        // todo: require executor
+        // todo: require _message.sender() == executor
 
         LimitOrder memory order = abi.decode(_message, (LimitOrder));
 
         emit Fill(order.hash(), TypeCasts.bytes32ToAddress(_message.sender()), order.info.swapper, order.info.nonce);
     }
+
+    // TODO: add OptimismISM
 }
