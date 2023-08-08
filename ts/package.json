@@ -1,0 +1,19 @@
+{
+  "name": "cross-chain-uniswapx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@uniswap/uniswapx-sdk": "^1.1.0",
+    "ethers": "^5.7.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
