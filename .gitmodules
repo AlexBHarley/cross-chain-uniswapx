@@ -7,3 +7,6 @@
 [submodule "lib/uniswapx"]
 	path = lib/uniswapx
 	url = https://github.com/uniswap/uniswapx
+[submodule "lib/hyperlane-monorepo"]
+	path = lib/hyperlane-monorepo
+	url = https://github.com/hyperlane-xyz/hyperlane-monorepo
