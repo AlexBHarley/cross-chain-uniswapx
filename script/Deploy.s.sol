@@ -12,34 +12,31 @@ contract UniswapX is Script {
     function run() public {
         // https://docs.hyperlane.xyz/docs/resources/addresses#mailbox-1
 
-        // Optimism
         uint256 goerliFork = vm.createFork(vm.envString("RPC_URL_5"));
         vm.selectFork(goerliFork);
         vm.startBroadcast();
-        CrossChainReactor reactor = new CrossChainReactor(0xCC737a94FecaeC165AbCf12dED095BB13F037685);
-        console2.log("Reactor deployed to", address(reactor));
-        // vm.makePersistent(address(reactor));
+        CrossChainExecutor executor = new CrossChainExecutor(
+            0xCC737a94FecaeC165AbCf12dED095BB13F037685, 
+            0xF90cB82a76492614D07B82a7658917f3aC811Ac1
+        );
+        console2.log("Executor deployed to", address(executor));
         vm.stopBroadcast();
 
-        // Goerli
         uint256 opFork = vm.createSelectFork(vm.envString("RPC_URL_420"));
         vm.selectFork(opFork);
         vm.startBroadcast();
-        CrossChainExecutor executor = new CrossChainExecutor(0xCC737a94FecaeC165AbCf12dED095BB13F037685);
-        console2.log("Executor deployed to", address(executor));
-        // vm.makePersistent(address(executor));
+        CrossChainReactor reactor = new CrossChainReactor(0xCC737a94FecaeC165AbCf12dED095BB13F037685);
+        console2.log("Reactor deployed to", address(reactor));
         vm.stopBroadcast();
 
-        // Optimism
         vm.selectFork(goerliFork);
         vm.startBroadcast();
-        // reactor.initialize(address(executor));
-        vm.stopBroadcast();
+        executor.initialize(address(reactor));
+        vm.stopBroadcast();  
 
-        // Goerli
         vm.selectFork(opFork);
         vm.startBroadcast();
-        executor.initialize(address(reactor));
+        // reactor.initialize(address(executor));
         vm.stopBroadcast();
     }
 }
