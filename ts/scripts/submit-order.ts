@@ -1,16 +1,23 @@
-import { DutchOrderBuilder } from "@uniswap/uniswapx-sdk";
-import { BigNumber, Wallet, constants, ethers } from "ethers";
-import { optimismGoerli } from "viem/chains";
+import "cross-fetch/polyfill";
 
-import dotenv from "dotenv";
+import { DutchOrder, DutchOrderBuilder } from "@uniswap/uniswapx-sdk";
+import { BigNumber, Wallet, constants, ethers } from "ethers";
+
+import * as dotenv from "dotenv";
 import { hexlify, parseEther } from "ethers/lib/utils";
 dotenv.config();
 
-const OPTIMISM_GOERLI_CHAIN_ID = 420;
-const GOERLI_CHAIN_ID = 5;
+import {
+  UNISWAPX_SERVICE_URL,
+  OPTIMISM_GOERLI_CHAIN_ID,
+  GOERLI_CHAIN_ID,
+  LOCAL_REACTOR,
+  PERMIT2,
+  REMOTE_REACTOR,
+} from "./constants";
 
-const ONE_HOUR = 60 * 60;
-const DEADLINE = Math.floor(Date.now() / 1000 + ONE_HOUR);
+const FIVE_MINUTES = 60 * 5;
+const DEADLINE = Math.floor(Date.now() / 1000 + FIVE_MINUTES);
 
 async function main() {
   const client = new ethers.providers.JsonRpcProvider(
@@ -21,38 +28,40 @@ async function main() {
 
   const nonce = await client.getTransactionCount(await wallet.getAddress());
 
-  const chainId = optimismGoerli.id;
-  const builder = new DutchOrderBuilder(
-    chainId,
-    "0x37f189ebd107c3Ec2447Bdd9387a2B54d6ff9197", // reactor
-    "0x000000000022d473030f116ddee9f6b43ac78ba3" // Permit2 https://docs.uniswap.org/contracts/v3/reference/deployments
-  );
+  const chainId = OPTIMISM_GOERLI_CHAIN_ID;
 
   const startAmount = parseEther("0.01");
   const endAmount = parseEther("0.009");
 
-  const order = builder
-    .deadline(DEADLINE)
-    .decayEndTime(DEADLINE)
-    .decayStartTime(DEADLINE - 100)
-    .nonce(BigNumber.from(nonce))
-    .input({
-      token: constants.AddressZero,
-      startAmount: startAmount,
-      endAmount: startAmount,
-    })
-    .output({
-      token: constants.AddressZero,
-      startAmount,
-      endAmount,
-      recipient: await wallet.getAddress(),
-    })
-    .validation({
-      additionalValidationData: hexlify(GOERLI_CHAIN_ID),
+  const order = new DutchOrder(
+    {
+      reactor: LOCAL_REACTOR,
+      deadline: DEADLINE,
+      decayEndTime: DEADLINE,
+      decayStartTime: DEADLINE - 100,
+      input: {
+        token: constants.AddressZero,
+        startAmount: startAmount,
+        endAmount: startAmount,
+      },
+      outputs: [
+        {
+          token: constants.AddressZero,
+          startAmount,
+          endAmount,
+          recipient: await wallet.getAddress(),
+        },
+      ],
+      nonce: BigNumber.from(nonce),
+      swapper: process.env.ADDRESS!,
       additionalValidationContract: constants.AddressZero,
-    })
-    .swapper(process.env.ADDRESS!)
-    .build();
+      additionalValidationData: "0x",
+      exclusiveFiller: constants.AddressZero,
+      exclusivityOverrideBps: BigNumber.from(0),
+    },
+    420,
+    "0x000000000022d473030f116ddee9f6b43ac78ba3" // Permit2
+  );
 
   // Sign the built order
   const { domain, types, values } = order.permitData();
@@ -60,11 +69,20 @@ async function main() {
 
   const serializedOrder = order.serialize();
 
-  console.log({
-    signature,
-    serializedOrder,
+  console.log(order.hash());
+
+  const response = await fetch(`${UNISWAPX_SERVICE_URL}/dutch-auction/order`, {
+    method: "POST",
+    body: JSON.stringify({
+      encodedOrder: serializedOrder,
+      signature,
+      chainId,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
-  // submit serializedOrder and signature to order pool
+  console.log(response.status);
 }
 
 main();

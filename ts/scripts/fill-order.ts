@@ -1,16 +1,17 @@
 import "cross-fetch/polyfill";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 dotenv.config();
 
 import { DutchOrder } from "@uniswap/uniswapx-sdk";
 import { Wallet, ethers, utils, Contract } from "ethers";
 
 import {
-  CROSS_CHAIN_EXECUTOR,
+  REMOTE_REACTOR,
+  GOERLI_CHAIN_ID,
   OPTIMISM_GOERLI_CHAIN_ID,
   UNISWAPX_SERVICE_URL,
 } from "./constants";
-import { abi as CrossChainExecutorAbi } from "../../out/CrossChainExecutor.sol/CrossChainExecutor.json";
+import { abi as RemoteReactorAbi } from "../../out/ExclusiveDutchOrderReactor.sol/ExclusiveDutchOrderReactor.json";
 
 const [, , orderHash] = process.argv;
 if (!orderHash) {
@@ -20,7 +21,7 @@ if (!orderHash) {
 
 async function main() {
   const provider = new ethers.providers.JsonRpcProvider(
-    process.env[`${OPTIMISM_GOERLI_CHAIN_ID}_RPC_URL`]
+    process.env[`${GOERLI_CHAIN_ID}_RPC_URL`]
   );
   const wallet = new Wallet(process.env.PRIVATE_KEY!, provider);
 
@@ -55,11 +56,23 @@ async function main() {
     parseInt(parsed.info.additionalValidationData)
   );
 
-  const executor = new Contract(
-    CROSS_CHAIN_EXECUTOR,
-    CrossChainExecutorAbi,
-    wallet
+  const executor = new Contract(REMOTE_REACTOR, RemoteReactorAbi, wallet);
+
+  console.log({
+    order: order.encodedOrder,
+    sig: order.signature,
+  });
+
+  const response = await executor.execute(
+    {
+      order: order.encodedOrder,
+      sig: order.signature,
+    },
+    {
+      value: utils.parseEther("0.001"),
+    }
   );
+  console.log(response);
 }
 
 main();

@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@uniswap/uniswapx-sdk':
-    specifier: ^1.1.0
-    version: 1.1.0
+    specifier: ^1.2.0
+    version: 1.2.0
   cross-fetch:
     specifier: ^4.0.0
     version: 4.0.0
@@ -19,6 +19,9 @@ dependencies:
     version: 3.3.2
 
 devDependencies:
+  '@types/node':
+    specifier: ^20.4.9
+    version: 20.4.9
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -340,6 +343,10 @@ packages:
       '@ethersproject/strings': 5.7.0
     dev: false
 
+  /@types/node@20.4.9:
+    resolution: {integrity: sha512-8e2HYcg7ohnTUbHk8focoklEQYvemQmu9M/f43DZVx43kHn0tE3BY/6gSDxS7k0SprtS0NHvj+L80cGLnoOUcQ==}
+    dev: true
+
   /@uniswap/permit2-sdk@1.2.0:
     resolution: {integrity: sha512-Ietv3FxN7+RCXcPSED/i/8b0a2GUZrMdyX05k3FsSztvYKyPFAMS/hBXojF0NZqYB1bHecqYc7Ej+7tV/rdYXg==}
     dependencies:
@@ -362,8 +369,8 @@ packages:
       toformat: 2.0.0
     dev: false
 
-  /@uniswap/uniswapx-sdk@1.1.0:
-    resolution: {integrity: sha512-LIEaVnuqaGnm66Rt8s3XB8DzUo6gUNfI2HDarCXpS4e2wVb4FA2/hzsC41vbL4qR579cRCn/br4bNfNI6wvDWQ==}
+  /@uniswap/uniswapx-sdk@1.2.0:
+    resolution: {integrity: sha512-SSyqgd48GzD//MqDDcHO/iqmCAXnEhbLwjKIED/MuB9TXrCJ/A1MmKXRrO01p0z0tnUfNDwCGY4p/tpVrippWA==}
     engines: {node: '>=10'}
     dependencies:
       '@ethersproject/bytes': 5.7.0
